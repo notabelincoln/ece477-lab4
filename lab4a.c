@@ -7,12 +7,28 @@
 
 #include "wiringPi.h"
 
-#define BUFFER_SIZE 32
+#define DELAY_MIN 32
+#define DELAY_MAX 1024
 
 int main(int argc, char **argv)
 {
-	unsigned char previous_state;
-	unsigned int led_delay;
+	char previous_state;
+	char current_state;
+	char current_led;
+	char i, debug_flag;
+	signed char led_direction;
+	unsigned int led_delay_ms;
+
+	if (argc >= 2)
+		debug_flag = !strcmp("debug",argv[1]);
+	else
+		debug_flag = 0;
+
+	previous_state = 1;
+	current_led = 7;
+	led_delay_ms = 1024;
+	led_direction = 1;
+
 	// Set up appropriate GPIOs as outputs
 	wiringPiSetup();
 	for (i = 0; i < 8; i++)
@@ -23,7 +39,48 @@ int main(int argc, char **argv)
 	pullUpDnControl(8, PUD_UP);
 
 	while(1) {
-		sleep(1);
+
+		current_state = digitalRead(8);
+		if ((current_state != previous_state) && (previous_state == 1)) {
+			if ((led_delay_ms >= (DELAY_MIN*2)) && (led_direction == 1)) {
+				led_delay_ms /= 2;
+				if (debug_flag) 
+					printf("Decreased delay\n");
+			}
+
+			else if (led_direction == 1) {
+				led_direction = -1;
+				if (debug_flag)
+					printf("Swapped from LS -> MS to MS -> LS\n");
+			}
+
+			else if ((led_delay_ms <= (DELAY_MAX/2)) && (led_direction == -1)) {
+				led_delay_ms *= 2;
+				if (debug_flag)
+					printf("Delay increased\n");
+			}
+
+			else if (led_direction == -1) {
+				led_direction = 1;
+				if (debug_flag)
+					printf("Swapped from MS -> LS to LS -> MS\n");
+			}
+
+			if(debug_flag)
+				printf("Delay: %d\nDirection: %d\n%d\n%d\n--------------\n",
+					led_delay_ms,
+					led_direction,
+					previous_state,
+					current_state);
+		}
+
+		previous_state = current_state;
+
+		for (i = 0; i < 8; i++)
+			digitalWrite(((i*led_direction) + 8) % 8, (i==current_led));
+
+		current_led = (current_led == 0)? 7 : (current_led - 1);
+		usleep(led_delay_ms * 1000);
 	}
 	return 0;
 }
