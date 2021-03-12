@@ -1,3 +1,10 @@
+/* Abe Jordan
+ * ECE 477
+ * Lab 4
+ * Part A
+ * Uses a button (or just grounded GPIO input) to change the delay
+ * and direction of a the LEDs
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
