@@ -77,15 +77,15 @@ int main(int argc, char **argv)
 
 		// Determine new LED delay value
 		led_delay_ms_tmp = 0;
-		for (i = 0; i < 10; i++)
-			led_delay_ms_tmp |= ((~(digitalRead(8 + i)) & 1) << i);
-		
+		for (i = 0; i < 10; i++) {
+			led_delay_ms_tmp |= (!digitalRead(delay_inputs[i])) << i;
+		}
 		// Do not change LED delay if no buttons pressed
 		if (led_delay_ms_tmp == 0)
 			led_delay_ms_tmp = led_delay_ms;
 
 		// Determine whether to change LED direction
-		led_direction_tmp = digitalRead(19);
+		led_direction_tmp = digitalRead(direction_input);
 
 		// Update values with new ones if button is pressed
 		if ((current_state != previous_state) && (previous_state == 1)) {
