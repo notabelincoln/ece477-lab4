@@ -56,8 +56,8 @@ int main(int argc, char **argv)
 	 * unpressed = 0)
 	*/
 	for (i = 0; i < 10; i++) {
-		pinMode(8 + i, INPUT);
-		pullUpDnControl(8 + i, PUD_UP);
+		pinMode(9 + i, INPUT);
+		pullUpDnControl(9 + i, PUD_UP);
 	}
 
 	/* Use GPIO 19 to determine LED direction
@@ -85,7 +85,8 @@ int main(int argc, char **argv)
 				printf("Delay set to %u\n",led_delay_ms);
 			led_direction *= (led_direction_tmp == 0) ? -1 : 1;
 			if (debug_flag)
-				printf("Swapped from LS -> MS to MS -> LS\n");
+				printf("Direction set to %s\n",
+						(led_direction == 1)?"LS -> MS":"MS -> LS");
 		}
 
 		// Print debug data every delay
