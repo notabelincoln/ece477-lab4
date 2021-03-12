@@ -106,7 +106,9 @@ int main(int argc, char **argv)
 
 		// Update LEDs with appropriate values
 		for (i = 0; i < 8; i++)
-			digitalWrite(((i*led_direction) + 8) % 8, (i==current_led));
+			digitalWrite(i, (i==current_led));
+
+		current_led = (current_led + led_direction + 8) % 8;
 
 		// Delay with appropriate time (1 ms = 1000 us)
 		usleep(led_delay_ms * 1000);
