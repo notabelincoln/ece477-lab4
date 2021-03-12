@@ -1,3 +1,11 @@
+/* Abe Jordan
+ * ECE 477
+ * Lab 4
+ * Part B
+ * Uses a button (or just grounded GPIO input) to change the delay
+ * and direction of a the LEDs based on 9 additional buttons.  GPIO
+ * values are based around those given in the wiringPi library.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -17,8 +25,8 @@ int main(int argc, char **argv)
 	char current_state;
 	char current_led;
 	char i, debug_flag;
-	signed char led_direction;
-	unsigned int led_delay_ms;
+	signed char led_direction, led_direction_tmp;
+	unsigned int led_delay_ms, led_delay_ms_tmp;
 
 	// Check if debug mode is enabled
 	if (argc >= 2)
@@ -40,34 +48,44 @@ int main(int argc, char **argv)
 	for (i = 0; i < 8; i++)
 		pinMode(i, OUTPUT);
 
-	// Use GPIO 8 as input for "button"
+	// Use GPIO 8 as input for "button" to change delay/direction
 	pinMode(8, INPUT);
 	pullUpDnControl(8, PUD_UP);
 
+	/* Use GPIO 9 - 18 to determine delay value (pressed = 1,
+	 * unpressed = 0)
+	*/
+	for (i = 0; i < 10; i++) {
+		pinMode(8 + i, INPUT);
+		pullUpDnControl(8 + i, PUD_UP);
+	}
+
+	/* Use GPIO 19 to determine LED direction
+	 * (unpressed MS -> LS, pressed LS -> MS)
+	 */
+	pinMode(19, INPUT);
+	pullUpDnControl(19, PUD_UP);
+
 	while(1) {
-
-
 		// Change LED speed and direction based upon current status 
 		current_state = digitalRead(8);
-		if ((current_state != previous_state) && (previous_state == 1)) {
-			if ((led_delay_ms >= (DELAY_MIN*2)) && (led_direction == 1)) {
-				led_delay_ms /= 2;
-				if (debug_flag) 
-					printf("Decreased delay\n");
-			} else if (led_direction == 1) {
-				led_direction = -1;
-				if (debug_flag)
-					printf("Swapped from LS -> MS to MS -> LS\n");
-			} else if ((led_delay_ms <= (DELAY_MAX/2)) && (led_direction == -1)) {
-				led_delay_ms *= 2;
-				if (debug_flag)
-					printf("Delay increased\n");
-			} else if (led_direction == -1) {
-				led_direction = 1;
-				if (debug_flag)
-					printf("Swapped from MS -> LS to LS -> MS\n");
-			}
 
+		// Determine new LED delay value
+		led_delay_ms_tmp = 0;
+		for (i = 0; i < 10; i++)
+			led_delay_ms_tmp |= ((~(digitalRead(8 + i)) & 1) << i);
+
+		// Determine whether to change LED direction
+		led_direction_tmp = digitalRead(19);
+
+		// Update values with new ones if button is pressed
+		if ((current_state != previous_state) && (previous_state == 1)) {
+			led_delay_ms = led_delay_ms_tmp;
+			if (debug_flag) 
+				printf("Delay set to %u\n",led_delay_ms);
+			led_direction *= (led_direction_tmp == 0) ? -1 : 1;
+			if (debug_flag)
+				printf("Swapped from LS -> MS to MS -> LS\n");
 		}
 
 		// Print debug data every delay
