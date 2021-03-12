@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 	 * Initialize default delay, assume button does not start pressed, and
 	 * make LEDs move from MS -> LS
 	 */
-	previous_state = 1;
+	previous_state = 0;
 	current_led = 7;
 	led_delay_ms = 1024;
 	led_direction = 1;
