@@ -20,10 +20,10 @@
 int main(int argc, char **argv)
 {
 	// Variables for the LED 
-	char previous_state;
-	char current_state;
-	char current_led;
-	char i, debug_flag;
+	unsigned char previous_state;
+	unsigned char current_state;
+	unsigned char current_led;
+	unsigned char i, debug_flag;
 	signed char led_direction;
 	unsigned int led_delay_ms;
 
@@ -89,8 +89,9 @@ int main(int argc, char **argv)
 
 		// Update LEDs with appropriate values
 		for (i = 0; i < 8; i++)
-			digitalWrite(((i*led_direction) + 8) % 8, (i==current_led));
+			digitalWrite(i, (i==current_led));
 
+		current_led = (current_led + led_direction + 8) % 8;
 		// Delay with appropriate time (1 ms = 1000 us)
 		usleep(led_delay_ms * 1000);
 	}

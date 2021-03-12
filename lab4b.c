@@ -21,17 +21,17 @@
 int main(int argc, char **argv)
 {
 	// Variables for the LED 
-	char previous_state;
-	char current_state;
-	char current_led;
-	char i, debug_flag;
-	signed char led_direction, led_direction_tmp;
+	unsigned char previous_state;
+	unsigned char current_state;
+	unsigned char current_led;
+	unsigned char i, debug_flag;
 	unsigned int led_delay_ms, led_delay_ms_tmp;
+	signed char led_direction, led_direction_tmp;
 
-	char led_outputs[8] = {0,1,2,3,4,5,6,7};
-	char button_input = 8;
-	char delay_inputs[8] = {9,10,11,12,13,14,15,16,21,22};
-	char direction_input = 23;
+	unsigned char led_outputs[8] = {0,1,2,3,4,5,6,7};
+	unsigned char button_input = 8;
+	unsigned char delay_inputs[10] = {9,10,11,12,13,14,15,16,21,22};
+	unsigned char direction_input = 23;
 
 	// Check if debug mode is enabled
 	if (argc >= 2)
@@ -68,8 +68,8 @@ int main(int argc, char **argv)
 	/* Use GPIO 23 to determine LED direction
 	 * (unpressed MS -> LS, pressed LS -> MS)
 	 */
-	pinMode(direction, INPUT);
-	pullUpDnControl(direction, PUD_UP);
+	pinMode(direction_input, INPUT);
+	pullUpDnControl(direction_input, PUD_UP);
 
 	while(1) {
 		// Change LED speed and direction based upon current status 
