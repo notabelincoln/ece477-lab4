@@ -28,6 +28,11 @@ int main(int argc, char **argv)
 	signed char led_direction, led_direction_tmp;
 	unsigned int led_delay_ms, led_delay_ms_tmp;
 
+	char led_outputs[8] = {0,1,2,3,4,5,6,7};
+	char button_input = 8;
+	char delay_inputs[8] = {9,10,11,12,13,14,15,16,21,22};
+	char direction_input = 23;
+
 	// Check if debug mode is enabled
 	if (argc >= 2)
 		debug_flag = !strcmp("debug",argv[1]);
@@ -46,25 +51,25 @@ int main(int argc, char **argv)
 	// Set up appropriate GPIOs as outputs
 	wiringPiSetup();
 	for (i = 0; i < 8; i++)
-		pinMode(i, OUTPUT);
+		pinMode(led_outputs[i], OUTPUT);
 
 	// Use GPIO 8 as input for "button" to change delay/direction
-	pinMode(8, INPUT);
-	pullUpDnControl(8, PUD_UP);
+	pinMode(button_input, INPUT);
+	pullUpDnControl(button_input, PUD_UP);
 
-	/* Use GPIO 9 - 18 to determine delay value (pressed = 1,
+	/* Use GPIO 9 - 16, 21, 22 to determine 10-bit delay value (pressed = 1,
 	 * unpressed = 0)
 	*/
 	for (i = 0; i < 10; i++) {
-		pinMode(9 + i, INPUT);
-		pullUpDnControl(9 + i, PUD_UP);
+		pinMode(delay_inputs[i], INPUT);
+		pullUpDnControl(delay_inputs[i], PUD_UP);
 	}
 
-	/* Use GPIO 21 to determine LED direction
+	/* Use GPIO 23 to determine LED direction
 	 * (unpressed MS -> LS, pressed LS -> MS)
 	 */
-	pinMode(21, INPUT);
-	pullUpDnControl(21, PUD_UP);
+	pinMode(direction, INPUT);
+	pullUpDnControl(direction, PUD_UP);
 
 	while(1) {
 		// Change LED speed and direction based upon current status 
