@@ -60,11 +60,11 @@ int main(int argc, char **argv)
 		pullUpDnControl(9 + i, PUD_UP);
 	}
 
-	/* Use GPIO 19 to determine LED direction
+	/* Use GPIO 21 to determine LED direction
 	 * (unpressed MS -> LS, pressed LS -> MS)
 	 */
-	pinMode(19, INPUT);
-	pullUpDnControl(19, PUD_UP);
+	pinMode(21, INPUT);
+	pullUpDnControl(21, PUD_UP);
 
 	while(1) {
 		// Change LED speed and direction based upon current status 
