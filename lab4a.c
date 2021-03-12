@@ -12,6 +12,7 @@
 
 int main(int argc, char **argv)
 {
+	// Variables for the LED 
 	char previous_state;
 	char current_state;
 	char current_led;
@@ -19,11 +20,16 @@ int main(int argc, char **argv)
 	signed char led_direction;
 	unsigned int led_delay_ms;
 
+	// Check if debug mode is enabled
 	if (argc >= 2)
 		debug_flag = !strcmp("debug",argv[1]);
 	else
 		debug_flag = 0;
 
+	/* 
+	 * Initialize default delay, assume button does not start pressed, and
+	 * make LEDs move from MS -> LS
+	 */
 	previous_state = 1;
 	current_led = 7;
 	led_delay_ms = 1024;
@@ -40,47 +46,48 @@ int main(int argc, char **argv)
 
 	while(1) {
 
+
+		// Change LED speed and direction based upon current status 
 		current_state = digitalRead(8);
 		if ((current_state != previous_state) && (previous_state == 1)) {
 			if ((led_delay_ms >= (DELAY_MIN*2)) && (led_direction == 1)) {
 				led_delay_ms /= 2;
 				if (debug_flag) 
 					printf("Decreased delay\n");
-			}
-
-			else if (led_direction == 1) {
+			} else if (led_direction == 1) {
 				led_direction = -1;
 				if (debug_flag)
 					printf("Swapped from LS -> MS to MS -> LS\n");
-			}
-
-			else if ((led_delay_ms <= (DELAY_MAX/2)) && (led_direction == -1)) {
+			} else if ((led_delay_ms <= (DELAY_MAX/2)) && (led_direction == -1)) {
 				led_delay_ms *= 2;
 				if (debug_flag)
 					printf("Delay increased\n");
-			}
-
-			else if (led_direction == -1) {
+			} else if (led_direction == -1) {
 				led_direction = 1;
 				if (debug_flag)
 					printf("Swapped from MS -> LS to LS -> MS\n");
 			}
 
-			if(debug_flag)
-				printf("Delay: %d\nDirection: %d\n%d\n%d\n--------------\n",
+		}
+
+		// Print debug data every delay
+		if (debug_flag)
+			printf("Delay: %d\nDirection: %d\n%d\n%d\n--------------\n",
 					led_delay_ms,
 					led_direction,
 					previous_state,
 					current_state);
-		}
 
 		previous_state = current_state;
 
+		// Update LEDs with appropriate values
 		for (i = 0; i < 8; i++)
 			digitalWrite(((i*led_direction) + 8) % 8, (i==current_led));
 
-		current_led = (current_led == 0)? 7 : (current_led - 1);
+		// Delay with appropriate time (1 ms = 1000 us)
 		usleep(led_delay_ms * 1000);
 	}
+
+	// Not needed, but if it gest to here, the program executed completely
 	return 0;
 }
